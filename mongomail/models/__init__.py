@@ -3,6 +3,5 @@ from .email import (
 )
 
 from .domain import (
-    Domain,
-    DomainUsers
+    Domain
 )
