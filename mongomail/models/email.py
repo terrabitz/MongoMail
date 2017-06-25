@@ -1,7 +1,7 @@
-import mongoengine
+from mongoengine import EmbeddedDocument
 from mongoengine.fields import EmailField, StringField
 
-class Email(mongoengine.Document):
+class Email(EmbeddedDocument):
     from_address = EmailField()
     body = StringField()
 

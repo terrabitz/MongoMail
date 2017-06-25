@@ -1,32 +1,35 @@
+import asyncio
+
+from aiosmtpd.controller import Controller
+
+from mongomail.utils import validate_email_addr, split_email_addr
+
+
 class MongoMailHandler:
     response_error = '550 could not process email'
     response_ok = "250 OK"
 
-    def __init__(self, mongo_addr='localhost', mongo_port=27017, mongo_user=None, mongo_password=None,
-                 db_name='mongomail'):
-        self.mongo_addr = mongo_addr
-        self.mongo_port = mongo_port
-        self.mongo_user = mongo_user
-        self.mongo_password = mongo_password
-        self.db_name = db_name
-        connect(db=self.db_name, host=self.mongo_addr, port=self.mongo_port, username=self.mongo_user,
-                password=self.mongo_password)
+    def __init__(self, connection):
+        self.connection = connection
 
     async def handle_RCPT(self, server, session, envelope, address, rcpt_options):
-        if not '@' in address:
+        _, domain = split_email_addr(address)
+        if not validate_email_addr(address):
             return self.response_error
-        to_domain = address.split('@')[-1]
-        if self.check_domain(to_domain):
+        if self.connection.check_domain(domain):
             rcpt_options.rcpt_tos.append(address)
             return self.response_ok
-        return self.response_error
+        else:
+            return self.response_error
 
     async def handle_DATA(self, server, session, envelope):
         to_addresses = envelope.rcpt_to
-        for to_address in to_addresses:
-            if not self.check_domain(to_address.split('@')[-1]):
+        for to_addr in to_addresses:
+            user, domain = split_email_addr(to_addr)
+            if not self.connection.check_user(user, domain):
                 return self.response_error
-
-
-        email = Email(from_address=envelope.mail_from, to_address)
+            else:
+                from_addr = envelope.mail_from
+                content = envelope.content.decode('utf-8')
+                self.connection.add_email(from_addr=from_addr, to_addr=to_addr, content=content)
 
