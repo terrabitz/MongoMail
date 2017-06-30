@@ -31,5 +31,5 @@ class MongoMailHandler:
             else:
                 from_addr = envelope.mail_from
                 content = envelope.content.decode('utf-8')
-                self.connection.add_email(from_addr=from_addr, to_addr=to_addr, content=content)
+                self.connection.add_email(from_addr=from_addr, to_addr=to_addr, body=content)
 

@@ -22,19 +22,20 @@ class MongoConnection(Connection):
         domain_object = Domain(domain=domain)
         domain_object.save()
 
-    def add_email(self, to_addr, from_addr, content):
+    def add_email(self, to_addr, from_addr, body):
         if not validate_email_addr(to_addr):
             raise ValueError('To Address not valid: ' + to_addr)
         user, domain = split_email_addr(to_addr)
         user_obj = self.get_user(username=user, domain=domain)
-        email = Email(from_address=from_addr, body=content, to_addr_id=user_obj._id)
+        email = Email(from_addr=from_addr, to_addr=to_addr, body=body, user_ref=user_obj)
         email.save()
 
     def add_user(self, username, domain):
         if not validate_domain(domain):
             raise ValueError('Domain not valid: {}'.format(domain))
 
-        user_obj = DomainUser(username=username, domain=domain)
+        domain_obj = self.get_domain(domain)
+        user_obj = DomainUser(username=username, domain=domain_obj)
         user_obj.save()
 
     def delete_domain(self, domain):
@@ -56,16 +57,19 @@ class MongoConnection(Connection):
         return Email.objects(_id=email_id).get()
 
     def get_emails(self, username, domain):
-        user_obj_id = self.get_user(username, domain)._id
-        return Email.objects(to_addr_id=user_obj_id)
+        user_obj = self.get_user(username, domain)
+        return Email.objects(user_ref=user_obj)
 
     def get_user(self, username, domain):
-        return DomainUser.objects(username=username, domain=domain).get()
+        domain_obj = self.get_domain(domain)
+        return DomainUser.objects(username=username, domain=domain_obj).get()
 
     def get_users(self, domain):
-        return DomainUser.objects(domain=domain)
+        domain_obj = self.get_domain(domain)
+        return DomainUser.objects(domain=domain_obj)
 
     def clear_db(self):
         DomainUser.drop_collection()
         Domain.drop_collection()
         Email.drop_collection()
+
