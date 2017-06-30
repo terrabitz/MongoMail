@@ -37,7 +37,7 @@ class Connection:
     def get_domains(self):
         raise NotImplementedError
 
-    def get_emails(self, to_addr):
+    def get_emails(self, username, domain):
         raise NotImplementedError
 
     def get_user(self, username, domain):
@@ -46,5 +46,3 @@ class Connection:
     def get_users(self, domain):
         raise NotImplementedError
 
-    def clear_db(self):
-        raise NotImplementedError

@@ -1,15 +1,15 @@
 from mongoengine import Document, EmbeddedDocument
-from mongoengine.fields import StringField, ListField, ReferenceField, EmbeddedDocumentField
+from mongoengine.fields import StringField, ReferenceField
 
 from .email import Email
 
-class DomainUser(EmbeddedDocument):
-    username = StringField(required=True)
-    emails = ListField(EmbeddedDocumentField(Email))
+
+class DomainUser(Document):
+    domain = ReferenceField(required=True)
+    username = StringField(required=True, unique_with=domain)
 
 class Domain(Document):
-    domain = StringField(required=True, unique=True)
-    users = ListField(EmbeddedDocumentField(DomainUser))
+    domain = StringField(required=True, unique=True, primary_key=True)
 
     meta = {
         'collection': 'domains'

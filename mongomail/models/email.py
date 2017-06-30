@@ -1,9 +1,11 @@
-from mongoengine import EmbeddedDocument
-from mongoengine.fields import EmailField, StringField
+from mongoengine import Document
+from mongoengine.fields import EmailField, StringField, ObjectIdField, ReferenceField
 
-class Email(EmbeddedDocument):
+class Email(Document):
     from_address = EmailField()
-    body = StringField()
+    body = StringField(required=True)
+
+    to_addr_id = ReferenceField(required=True)
 
     meta = {
         'collection': 'emails'
