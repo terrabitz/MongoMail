@@ -12,16 +12,6 @@ class Connection:
     def add_user(self, username, domain):
         raise NotImplementedError
 
-    def check_domain(self, domain):
-        raise NotImplementedError
-
-    def check_email_addr(self, email_addr):
-        username, domain = split_email_addr(email_addr)
-        return self.check_user(username=username, domain=domain)
-
-    def check_user(self, username, domain):
-        raise NotImplementedError
-
     def delete_domain(self, domain):
         raise NotImplementedError
 
