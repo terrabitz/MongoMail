@@ -4,12 +4,6 @@ from mongomail.db import MongoConnection
 from mongomail.utils import split_email_addr
 
 
-@pytest.fixture
-def db_handler():
-    connection = MongoConnection(db_name='mongomail-test')
-    yield connection
-    connection.clear_db()
-
 def test_domain(db_handler: MongoConnection):
     domain = 'example.com'
 
