@@ -1,5 +1,6 @@
 from email.message import EmailMessage
 import smtplib
+from smtplib import SMTPRecipientsRefused
 import time
 
 import pytest
@@ -40,6 +41,8 @@ def add_test_user(handler, domain='example.com', user='example'):
     handler.add_user(username=user, domain=domain)
 
 
+# Tests #####################################################################
+
 def test_send_valid_email(handler: MongoConnection, mail_client: smtplib.SMTP):
     add_test_user(handler)
 
@@ -50,9 +53,19 @@ def test_send_valid_email(handler: MongoConnection, mail_client: smtplib.SMTP):
     assert len(handler.get_emails(username=username, domain=domain)) > 0
 
 
-def test_send_wrong_domain():
-    test_domain = 'example'
+def test_send_wrong_domain(handler: MongoConnection, mail_client: smtplib.SMTP):
+    add_test_user(handler)
+
+    msg = create_msg(to_addr='example@asdf.com')
+
+    with pytest.raises(SMTPRecipientsRefused):
+        mail_client.send_message(msg)
 
 
-def test_send_bad_to_addr():
-    pass
+def test_send_bad_to_addr(handler: MongoConnection, mail_client: smtplib.SMTP):
+    add_test_user(handler)
+
+    msg = create_msg(to_addr='asdf')
+
+    with pytest.raises(SMTPRecipientsRefused):
+        mail_client.send_message(msg)
