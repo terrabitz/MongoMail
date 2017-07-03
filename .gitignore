@@ -1,1 +1,7 @@
 .idea/
+.cache
+.cache/
+__pycache__/
+mongomail/__pycache__/
+mongomail/db/__pycache__/
+mongomail/models/__pycache__/
