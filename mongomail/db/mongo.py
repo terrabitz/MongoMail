@@ -54,7 +54,7 @@ class MongoConnection(Connection):
         return Domain.objects
 
     def get_email(self, email_id):
-        return Email.objects(_id=email_id).get()
+        return Email.objects(id=email_id).get()
 
     def get_emails(self, username, domain):
         user_obj = self.get_user(username, domain)

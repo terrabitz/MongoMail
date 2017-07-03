@@ -5,7 +5,7 @@ import time
 
 import pytest
 
-from mongomail.server import controller
+from mongomail.smtp_server import controller
 from mongomail.db import MongoConnection
 from mongomail.utils import split_email_addr
 

@@ -2,3 +2,6 @@ aiosmtpd
 mongoengine
 raven
 pytest
+flask
+flask-restful
+gunicorn
