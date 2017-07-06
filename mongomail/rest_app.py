@@ -2,15 +2,19 @@ from bson import ObjectId
 import traceback
 
 from flask import Flask
-from flask_restful import Resource, Api, fields, marshal_with
+from flask_restful import Resource, Api
 from mongoengine.errors import DoesNotExist, NotUniqueError
 
-from mongomail.smtp_server import connection, controller
+from mongomail import config
+from mongomail.db import MongoConnection
 
+# Setup connection
+
+connection = MongoConnection(db_name=config.MONGO_DB, mongo_addr=config.MONGO_HOST, mongo_port=config.MONGO_PORT,
+                             mongo_password=config.MONGO_PASSWORD, mongo_user=config.MONGO_USER)
 app = Flask(__name__)
+app.config.from_pyfile('config.py')
 api = Api(app)
-
-controller.start()
 
 ERROR_RESPONSE = {'status': 'error', 'error': 'An error occured'}, 500
 NOT_FOUND_RESPONSE = {'status': 'error', 'error': 'The resource does not exist'}, 404
@@ -126,4 +130,4 @@ api.add_resource(Users, '/<string:domain>/<string:username>')
 api.add_resource(AllEmails, '/<string:domain>/<string:username>/emails')
 
 if __name__ == '__main__':
-    app.run()
+    app.run('0.0.0.0', debug=True)

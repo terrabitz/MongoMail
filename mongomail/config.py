@@ -1,0 +1,10 @@
+MONGO_DB = 'mongomail'
+MONGO_HOST = 'localhost'
+MONGO_PORT = 27017
+MONGO_USER = None
+MONGO_PASSWORD = None
+
+MAIL_HOST = "0.0.0.0"
+MAIL_PORT = 25
+
+DEBUG = False
