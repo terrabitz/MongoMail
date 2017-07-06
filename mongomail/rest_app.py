@@ -10,8 +10,7 @@ from mongomail.db import MongoConnection
 
 # Setup connection
 
-connection = MongoConnection(db_name=config.MONGO_DB, mongo_addr=config.MONGO_HOST, mongo_port=config.MONGO_PORT,
-                             mongo_password=config.MONGO_PASSWORD, mongo_user=config.MONGO_USER)
+
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 api = Api(app)
@@ -45,41 +44,41 @@ def nice_errors(func):
 class Users(Resource):
     @nice_errors
     def get(self, username, domain):
-        user_obj = connection.get_user(username=username, domain=domain)
+        user_obj = app.connection.get_user(username=username, domain=domain)
         return {'username': user_obj.username, 'domain': user_obj.domain.domain}
 
     @nice_errors
     def put(self, username, domain):
-        connection.add_user(username=username, domain=domain)
+        app.connection.add_user(username=username, domain=domain)
         return {}
 
     @nice_errors
     def delete(self, username, domain):
-        connection.delete_user(username=username, domain=domain)
+        app.connection.delete_user(username=username, domain=domain)
         return {}
 
 
 class Domain(Resource):
     @nice_errors
     def get(self, domain):
-        domain_obj = connection.get_domain(domain)
+        domain_obj = app.connection.get_domain(domain)
         return {'domain': domain_obj.domain}
 
     @nice_errors
     def put(self, domain):
-        connection.add_domain(domain)
+        app.connection.add_domain(domain)
         return {}
 
     @nice_errors
     def delete(self, domain):
-        connection.delete_domain(domain)
+        app.connection.delete_domain(domain)
         return {}
 
 
 class AllDomains(Resource):
     @nice_errors
     def get(self):
-        domain_objs = connection.get_domains()
+        domain_objs = app.connection.get_domains()
         ret_val = [domain_obj.domain for domain_obj in domain_objs]
         return {'domains': ret_val}
 
@@ -87,7 +86,7 @@ class AllDomains(Resource):
 class AllUsers(Resource):
     @nice_errors
     def get(self, domain):
-        user_objs = connection.get_users(domain)
+        user_objs = app.connection.get_users(domain)
         ret_val = [user_obj.username for user_obj in user_objs]
         return {'users': ret_val}
 
@@ -95,7 +94,7 @@ class AllUsers(Resource):
 class AllEmails(Resource):
     @nice_errors
     def get(self, domain, username):
-        email_objs = connection.get_emails(username, domain)
+        email_objs = app.connection.get_emails(username, domain)
         ret_val = []
         for email_obj in email_objs:
             mail_id = str(email_obj.id)
@@ -110,7 +109,7 @@ class Email(Resource):
     @nice_errors
     def get(self, email_id):
         email_id_bson = ObjectId(email_id)
-        email_obj = connection.get_email(email_id_bson)
+        email_obj = app.connection.get_email(email_id_bson)
         return {'from': email_obj.from_addr,
                 'to': email_obj.to_addr,
                 'body': email_obj.body,
@@ -119,7 +118,7 @@ class Email(Resource):
     @nice_errors
     def delete(self, email_id):
         email_id_bson = ObjectId(email_id)
-        connection.delete_email(email_id_bson)
+        app.connection.delete_email(email_id_bson)
 
 
 api.add_resource(AllDomains, '/domains')
