@@ -1,5 +1,6 @@
 aiosmtpd
 mongoengine
+flask-mongoengine
 raven
 pytest
 flask
