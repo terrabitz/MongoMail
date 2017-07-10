@@ -40,6 +40,9 @@ def nice_errors(func):
 
     return _redirect_on_error
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return NOT_FOUND_RESPONSE
 
 class Users(Resource):
     @nice_errors
@@ -124,6 +127,8 @@ class Email(Resource):
 @app.route("/")
 def index():
     return json.dumps({'status': 'success'})
+
+
 
 
 api.add_resource(AllDomains, '/domains')
