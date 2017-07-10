@@ -7,4 +7,4 @@ from mongomail.rest_app import app, db
 def init_db():
     db.init_app(app)
 
-app.run()
+app.run(host='0.0.0.0', port=80)
