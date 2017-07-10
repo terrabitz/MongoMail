@@ -1,5 +1,6 @@
 from bson import ObjectId
 import traceback
+import json
 
 from flask import Flask
 from flask_mongoengine import MongoEngine
@@ -118,6 +119,11 @@ class Email(Resource):
     def delete(self, email_id):
         email_id_bson = ObjectId(email_id)
         connection.delete_email(email_id_bson)
+
+
+@app.route("/")
+def index():
+    return json.dumps({'status': 'success'})
 
 
 api.add_resource(AllDomains, '/domains')
