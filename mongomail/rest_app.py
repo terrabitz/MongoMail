@@ -2,14 +2,15 @@ from bson import ObjectId
 import traceback
 
 from flask import Flask
+from flask_mongoengine import MongoEngine
 from flask_restful import Resource, Api
 from mongoengine.errors import DoesNotExist, NotUniqueError
 
 from mongomail.db.mongo import MongoConnection
-from .models import Domain, DomainUser, Email
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
+db = MongoEngine()
 api = Api(app)
 connection = MongoConnection()
 

@@ -6,3 +6,5 @@ pytest
 flask
 flask-restful
 gunicorn
+uwsgi
+uwsgidecorators
