@@ -129,11 +129,9 @@ def index():
     return json.dumps({'status': 'success'})
 
 
-
-
 api.add_resource(AllDomains, '/domains')
-api.add_resource(Email, '/emails/<string:email_id>')
+api.add_resource(Email, '/email/<string:email_id>')
+api.add_resource(AllUsers, '/users/<string:domain>')
 api.add_resource(Domain, '/<string:domain>')
-api.add_resource(AllUsers, '/<string:domain>/users')
 api.add_resource(Users, '/<string:domain>/<string:username>')
 api.add_resource(AllEmails, '/<string:domain>/<string:username>/emails')
