@@ -1,21 +1,9 @@
-from mongoengine import connect
-
 from mongomail.models import Email, DomainUser, Domain
 from mongomail.utils import validate_domain, validate_email_addr, split_email_addr
 from ._base import Connection
 
 
 class MongoConnection(Connection):
-    def __init__(self, db_name, mongo_addr='127.0.0.1', mongo_port=27017, mongo_user=None, mongo_password=None):
-        self.mongo_addr = mongo_addr
-        self.mongo_port = mongo_port
-        self.mongo_user = mongo_user
-        self.mongo_password = mongo_password
-        self.db_name = db_name
-
-        connect(db=self.db_name, host=self.mongo_addr, port=self.mongo_port, username=self.mongo_user,
-                password=self.mongo_password)
-
     def add_domain(self, domain):
         if not validate_domain(domain):
             raise ValueError('Domain not valid')
