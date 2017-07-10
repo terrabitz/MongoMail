@@ -1,8 +1,8 @@
-MONGO_DB = 'mongomail'
-MONGO_HOST = 'localhost'
-MONGO_PORT = 27017
-MONGO_USER = None
-MONGO_PASSWORD = None
+MONGODB_DB = 'mongomail'
+MONGODB_HOST = 'localhost'
+MONGODB_PORT = 27017
+MONGODB_USER = None
+MONGODB_PASSWORD = None
 
 MAIL_HOST = "0.0.0.0"
 MAIL_PORT = 8025
