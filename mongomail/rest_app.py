@@ -2,7 +2,7 @@ from bson import ObjectId
 import traceback
 import json
 
-from flask import Flask
+from flask import Flask, request
 from flask_mongoengine import MongoEngine
 from flask_restful import Resource, Api
 from mongoengine.errors import DoesNotExist, NotUniqueError
@@ -18,11 +18,26 @@ connection = MongoConnection()
 ERROR_RESPONSE = {'status': 'error', 'error': 'An error occured'}, 500
 NOT_FOUND_RESPONSE = {'status': 'error', 'error': 'The resource does not exist'}, 404
 DUPLICATE_RESPONSE = {'status': 'error', 'error': 'The resource already exists'}, 404
+UNAUTH_RESPONSE = {'status': 'error', 'error': 'Endpoint requires authentication'}, 401
 SUCCESS_RESPONSE = {'status': 'success'}
+
+
+def check_auth(api_key):
+    try:
+        if connection.get_api_key(api_key):
+            return True
+        else:
+            return False
+    except:
+        return False
 
 
 def nice_errors(func):
     def _redirect_on_error(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username):
+            return UNAUTH_RESPONSE
+
         try:
             response = func(*args, **kwargs)
             if not response:
@@ -40,46 +55,47 @@ def nice_errors(func):
 
     return _redirect_on_error
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return NOT_FOUND_RESPONSE
 
+
 class Users(Resource):
-    @nice_errors
+    decorators = [nice_errors]
+
     def get(self, username, domain):
         user_obj = connection.get_user(username=username, domain=domain)
         return {'username': user_obj.username, 'domain': user_obj.domain.domain}
 
-    @nice_errors
     def put(self, username, domain):
         connection.add_user(username=username, domain=domain)
         return {}
 
-    @nice_errors
     def delete(self, username, domain):
         connection.delete_user(username=username, domain=domain)
         return {}
 
 
 class Domain(Resource):
-    @nice_errors
+    decorators = [nice_errors]
+
     def get(self, domain):
         domain_obj = connection.get_domain(domain)
         return {'domain': domain_obj.domain}
 
-    @nice_errors
     def put(self, domain):
         connection.add_domain(domain)
         return {}
 
-    @nice_errors
     def delete(self, domain):
         connection.delete_domain(domain)
         return {}
 
 
 class AllDomains(Resource):
-    @nice_errors
+    decorators = [nice_errors]
+
     def get(self):
         domain_objs = connection.get_domains()
         ret_val = [domain_obj.domain for domain_obj in domain_objs]
@@ -87,7 +103,8 @@ class AllDomains(Resource):
 
 
 class AllUsers(Resource):
-    @nice_errors
+    decorators = [nice_errors]
+
     def get(self, domain):
         user_objs = connection.get_users(domain)
         ret_val = [user_obj.username for user_obj in user_objs]
@@ -95,7 +112,8 @@ class AllUsers(Resource):
 
 
 class AllEmails(Resource):
-    @nice_errors
+    decorators = [nice_errors]
+
     def get(self, domain, username):
         email_objs = connection.get_emails(username, domain)
         ret_val = []
@@ -109,7 +127,8 @@ class AllEmails(Resource):
 
 
 class Email(Resource):
-    @nice_errors
+    decorators = [nice_errors]
+
     def get(self, email_id):
         email_id_bson = ObjectId(email_id)
         email_obj = connection.get_email(email_id_bson)
@@ -118,7 +137,6 @@ class Email(Resource):
                 'body': email_obj.body,
                 'id': email_id}
 
-    @nice_errors
     def delete(self, email_id):
         email_id_bson = ObjectId(email_id)
         connection.delete_email(email_id_bson)

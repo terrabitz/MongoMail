@@ -3,6 +3,10 @@ from mongoengine.fields import StringField, ReferenceField
 
 
 class Domain(Document):
+    """
+    This model defines a domain, defined as one email domain that the
+    mail server is responsible for
+    """
     domain = StringField(required=True, unique=True)
 
     meta = {

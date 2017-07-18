@@ -1,4 +1,4 @@
-from mongomail.models import Email, DomainUser, Domain
+from mongomail.models import Email, DomainUser, Domain, ApiKey
 from mongomail.utils import validate_domain, validate_email_addr, split_email_addr
 from ._base import Connection
 
@@ -34,6 +34,18 @@ class MongoConnection(Connection):
 
     def delete_user(self, username, domain):
         self.get_user(username, domain).delete()
+
+    def generate_api_key(self):
+        key_obj = ApiKey()
+        key_string = key_obj.key
+        key_obj.save()
+        return key_string
+
+    def get_api_keys(self):
+        return ApiKey.objects
+
+    def get_api_key(self, key_string):
+        return ApiKey.objects(key=key_string).get()
 
     def get_domain(self, domain):
         return Domain.objects(domain=domain).get()

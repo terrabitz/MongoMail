@@ -1,7 +1,6 @@
 from email.message import EmailMessage
 import smtplib
 from smtplib import SMTPRecipientsRefused
-import time
 
 import pytest
 

@@ -6,3 +6,7 @@ from .domain import (
     Domain,
     DomainUser
 )
+
+from .users import (
+    ApiKey
+)
