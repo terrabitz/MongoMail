@@ -1,8 +1,7 @@
 from bson import ObjectId
 import traceback
-import json
 
-from flask import Flask, request
+from flask import Flask, request, json
 from flask_mongoengine import MongoEngine
 from flask_restful import Resource, Api
 from mongoengine.errors import DoesNotExist, NotUniqueError
@@ -36,7 +35,7 @@ def nice_errors(func):
     def _redirect_on_error(*args, **kwargs):
         auth = request.authorization
         if not auth or not check_auth(auth.username):
-            return UNAUTH_RESPONSE
+            return json.dumps(UNAUTH_RESPONSE)
 
         try:
             response = func(*args, **kwargs)
@@ -44,21 +43,21 @@ def nice_errors(func):
                 response = SUCCESS_RESPONSE
             elif isinstance(response, dict):
                 response.update(**SUCCESS_RESPONSE)
-            return response
+            return json.dumps(response)
         except NotUniqueError:
-            return DUPLICATE_RESPONSE
+            return json.dumps(DUPLICATE_RESPONSE)
         except DoesNotExist:
-            return NOT_FOUND_RESPONSE
+            return json.dumps(NOT_FOUND_RESPONSE)
         except Exception as e:
             traceback.print_exc()
-            return ERROR_RESPONSE
+            return json.dumps(ERROR_RESPONSE)
 
     return _redirect_on_error
 
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return NOT_FOUND_RESPONSE
+    return json.dumps(NOT_FOUND_RESPONSE)
 
 
 class Users(Resource):
@@ -148,8 +147,9 @@ def index():
 
 
 api.add_resource(AllDomains, '/domains')
+api.add_resource(Domain, '/domains/<string:domain>')
+api.add_resource(AllUsers, '/domains/<string:domain>/users/')
+api.add_resource(Users, '/domains/<string:domain>/users/<string:username>')
+api.add_resource(AllEmails, '/domains/<string:domain>/users/<string:username>/emails')
 api.add_resource(Email, '/email/<string:email_id>')
-api.add_resource(AllUsers, '/users/<string:domain>')
-api.add_resource(Domain, '/<string:domain>')
-api.add_resource(Users, '/<string:domain>/<string:username>')
-api.add_resource(AllEmails, '/<string:domain>/<string:username>/emails')
+
